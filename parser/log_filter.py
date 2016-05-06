@@ -4,7 +4,7 @@ import time
 from os.path import os
 
 log_file_lines = []
-parse_log_file_path = os.path.join('..', '..', 'parse') # TEMPONARY
+parse_log_file_path = os.path.join('..', '..', 'parse_') # TEMPONARY
 settings_file = os.path.join('..', 'settings', 'settings')
 ignore_file = os.path.join('..', 'settings', 'ignore')
 
@@ -43,7 +43,7 @@ def write_parse_log(path, mode, collection, description):
 
 def find_file(path, regexp, extension = "txt"):
     if os.path.isdir(path):
-        return [path + "/" + file for file in os.listdir(path) if re.search(".*(" + regexp + "){1}.*" + extension + "{1}", file)]
+        return [path + os.sep + file for file in os.listdir(path) if re.search(".*(" + regexp + "){1}.*" + extension + "{1}", file)]
     else:
         raise InvalidPathException, "ERROR: Invalid path!"
 
