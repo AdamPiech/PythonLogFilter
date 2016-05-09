@@ -4,9 +4,9 @@ import time
 from os.path import os
 
 log_file_lines = []
-parse_log_file_path = os.path.join('..', '..', 'parse_') # TEMPONARY
-settings_file = os.path.join('..', 'settings', 'settings')
-ignore_file = os.path.join('..', 'settings', 'ignore')
+parse_log_file_path = os.path.join('parse_')
+settings_file = os.path.join('settings', 'settings')
+ignore_file = os.path.join('settings', 'ignore')
 
 keywords = set()
 ignore_words = set()
