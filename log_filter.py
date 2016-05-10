@@ -4,7 +4,7 @@ import time
 from os.path import os
 
 log_file_lines = []
-parse_log_file_path = os.path.join(time.strftime("%d.%m.%y_%H-%M-%S_")+'parse_')
+parse_log_file_path = ((sys.argv[1] + os.sep) if len(sys.argv) > 1 else '') + time.strftime("%d-%m-%y_%H-%M-%S") + '_parse_'
 
 settings_file = os.path.join('settings', 'extract')
 ignore_file = os.path.join('settings', 'ignore')
@@ -12,6 +12,10 @@ keywords = set()
 ignore_words = set()
 write_mode = 'a'
 read_mode = 'r'
+
+path_arg = sys.argv[1] if len(sys.argv) >= 2 else '.'
+regexp_arg = sys.argv[2] if len(sys.argv) >= 3 else ('dx','trx','re','ec')
+extension_arg = sys.argv[3] if len(sys.argv) >= 4 else 'txt'
 
 
 class InvalidPathException(Exception):
@@ -41,15 +45,22 @@ def read_log(path, mode):
 
 def write_parse_log(path, mode, collection, description):
     with open(path, mode) as write_log_file:
-        write_log_file.write("\n" * 2 + "#" * 15 + "   LOG FROM: " + description + "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n" * 3)
+        write_log_file.write("\n" * 2 + "#" * 15 + "   TYPE OF LOG: " + "some_func" + "   LOG FROM: " + description +
+                             "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n" * 3)
         write_log_file.writelines(collection)
 
 
-def find_file(path, regexp, extension = "txt"):
+def find_file(path = '.', regexp = '.*', extension = 'txt'):
     if os.path.isdir(path):
-        return [path + os.sep + file for file in os.listdir(path) if re.search(".*(" + regexp + "){1}.*" + extension + "{1}", file)]
-
-
+        if isinstance(regexp_arg, tuple):
+            files = []
+            for reg in regexp:
+                for file in os.listdir(path):
+                    if re.search(".*(" + reg + "){1}.*" + extension + "{1}", file):
+                        files.append(path + os.sep + file)
+            return files
+        else:
+            return [path + os.sep + file for file in os.listdir(path) if re.search(".*(" + regexp + "){1}.*" + extension + "{1}", file)]
     else:
         raise InvalidPathException, "ERROR: Invalid path!"
 
@@ -57,25 +68,6 @@ def find_file(path, regexp, extension = "txt"):
 read_options_file(settings_file, read_mode, keywords)
 read_options_file(ignore_file, read_mode, ignore_words)
 
-if len(sys.argv) >= 3:
-    for file in find_file(sys.argv[1], sys.argv[2], sys.argv[3]) if len(sys.argv) == 4 else find_file(sys.argv[1], sys.argv[2]):
-        try:
-            log_file_lines = read_log(file, read_mode)
-            write_parse_log(parse_log_file_path + sys.argv[2]+ ".log", write_mode, log_file_lines, file)
-        except InvalidPathException, err:
-            print "ERROR: Invalid path!"
-elif len(sys.argv) == 2:
-    for file in find_file(sys.argv[1], ""):
-        try:
-            log_file_lines = read_log(file, read_mode)
-            write_parse_log("../"+parse_log_file_path + "all.log", write_mode, log_file_lines, file)
-        except InvalidPathException, err:
-            print "ERROR: Invalid path!"
-else:
-    print "ERROR: Invalid number of arguments!"
-
-
-
-
-
-
+for file in find_file(path_arg, regexp_arg, extension_arg):
+    log_file_lines = read_log(file, read_mode)
+    write_parse_log(parse_log_file_path + ("all" if isinstance(regexp_arg, tuple) else regexp_arg) + ".log", write_mode, log_file_lines, file)
