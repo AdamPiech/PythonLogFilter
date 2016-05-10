@@ -48,6 +48,8 @@ def write_parse_log(path, mode, collection, description):
 def find_file(path, regexp, extension = "txt"):
     if os.path.isdir(path):
         return [path + os.sep + file for file in os.listdir(path) if re.search(".*(" + regexp + "){1}.*" + extension + "{1}", file)]
+
+
     else:
         raise InvalidPathException, "ERROR: Invalid path!"
 
@@ -66,7 +68,7 @@ elif len(sys.argv) == 2:
     for file in find_file(sys.argv[1], ""):
         try:
             log_file_lines = read_log(file, read_mode)
-            write_parse_log(parse_log_file_path + "all.log", write_mode, log_file_lines, file)
+            write_parse_log("../"+parse_log_file_path + "all.log", write_mode, log_file_lines, file)
         except InvalidPathException, err:
             print "ERROR: Invalid path!"
 else:
