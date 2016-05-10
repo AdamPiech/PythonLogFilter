@@ -4,7 +4,8 @@ import time
 from os.path import os
 
 log_file_lines = []
-parse_log_file_path = os.path.join(time.strftime("%y-%m-%d_%H:%M:%S_")+'parse_')
+parse_log_file_path = os.path.join(time.strftime("%d.%m.%y_%H-%M-%S_")+'parse_')
+
 settings_file = os.path.join('settings', 'extract')
 ignore_file = os.path.join('settings', 'ignore')
 keywords = set()
@@ -41,7 +42,6 @@ def read_log(path, mode):
 def write_parse_log(path, mode, collection, description):
     with open(path, mode) as write_log_file:
         write_log_file.write("\n" * 2 + "#" * 15 + "   LOG FROM: " + description + "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n" * 3)
-        write_log_file = re.match
         write_log_file.writelines(collection)
 
 
