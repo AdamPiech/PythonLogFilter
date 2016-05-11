@@ -14,7 +14,7 @@ write_mode = 'a'
 read_mode = 'r'
 
 path_arg = sys.argv[1] if len(sys.argv) >= 2 else '.'
-regexp_arg = sys.argv[2] if len(sys.argv) >= 3 else ('dx','trx','re','ec')
+regexp_arg = sys.argv[2] if len(sys.argv) >= 3 else ('dx', 'trx', 're', 'ec')
 extension_arg = sys.argv[3] if len(sys.argv) >= 4 else 'txt'
 
 
@@ -45,9 +45,19 @@ def read_log(path, mode):
 
 def write_parse_log(path, mode, collection, description):
     with open(path, mode) as write_log_file:
-        write_log_file.write("\n" * 2 + "#" * 15 + "   TYPE OF LOG: " + "some_func" + "   LOG FROM: " + description +
+        write_log_file.write("\n" * 2 + "#" * 15 + "   TYPE OF LOG: " + str(type_of_log(description)) + " LOG FROM: " + description +
                              "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n" * 3)
         write_log_file.writelines(collection)
+
+
+def type_of_log(filename):
+    if isinstance(regexp_arg, tuple):
+            for log_type in regexp_arg:
+                if re.search(log_type, filename):
+                    return log_type
+    else:
+        if re.search(regexp_arg, filename):
+            return regexp_arg
 
 
 def find_file(path = '.', regexp = '.*', extension = 'txt'):
@@ -67,6 +77,7 @@ def find_file(path = '.', regexp = '.*', extension = 'txt'):
 
 read_options_file(settings_file, read_mode, keywords)
 read_options_file(ignore_file, read_mode, ignore_words)
+
 
 for file in find_file(path_arg, regexp_arg, extension_arg):
     log_file_lines = read_log(file, read_mode)
