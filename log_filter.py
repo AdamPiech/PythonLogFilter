@@ -35,12 +35,12 @@ for opt, arg in opts:
 parse_log_file_path = path_arg + os.sep + time.strftime("%d-%m-%y_%H-%M-%S") + '_parse_'
 
 
-class InvalidPathException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return `self.value`
+# class InvalidPathException(Exception):
+#     def __init__(self, value):
+#         self.value = value
+#
+#     def __str__(self):
+#         return `self.value`
 
 
 def read_options_file(path, mode, collection):
@@ -89,7 +89,9 @@ def find_file(path = '.', regexp = '.*', extension = 'txt'):
         else:
             return [path + os.sep + file for file in os.listdir(path) if re.search(".*(" + regexp + "){1}.*" + extension + "{1}", file)]
     else:
-        raise InvalidPathException, "ERROR: Invalid path!"
+        # raise InvalidPathException, "ERROR: Invalid path!"
+        print "ERROR: Invalid path!"
+        sys.exit(2)
 
 
 read_options_file(settings_file, read_mode, keywords)
