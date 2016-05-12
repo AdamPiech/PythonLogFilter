@@ -2,20 +2,37 @@ import sys
 import re
 import time
 from os.path import os
-
-log_file_lines = []
-parse_log_file_path = ((sys.argv[1] + os.sep) if len(sys.argv) > 1 else '') + time.strftime("%d-%m-%y_%H-%M-%S") + '_parse_'
+import getopt
 
 settings_file = os.path.join('settings', 'extract')
 ignore_file = os.path.join('settings', 'ignore')
+log_file_lines = []
 keywords = set()
 ignore_words = set()
 write_mode = 'a'
 read_mode = 'r'
 
-path_arg = sys.argv[1] if len(sys.argv) >= 2 else '.'
-regexp_arg = sys.argv[2] if len(sys.argv) >= 3 else ('dx', 'trx', 're', 'ec')
-extension_arg = sys.argv[3] if len(sys.argv) >= 4 else 'txt'
+path_arg = '..'
+regexp_arg = ('dx', 'trx', 're', 'ec')
+extension_arg = 'txt'
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], 'p:r:e:', ['path=', 'regexp=', 'extension='])
+except getopt.GetoptError:
+    print "ERROR: Invalid arguments!"
+    sys.exit(2)
+
+for opt, arg in opts:
+    if opt in ('-p', '--path'):
+        path_arg = arg
+    elif opt in ('-r', '--regexp'):
+        regexp_arg = arg
+    elif opt in ('-e', '--extension'):
+        extension_arg = arg
+    else:
+        sys.exit(2)
+
+parse_log_file_path = path_arg + os.sep + time.strftime("%d-%m-%y_%H-%M-%S") + '_parse_'
 
 
 class InvalidPathException(Exception):
@@ -45,7 +62,7 @@ def read_log(path, mode):
 
 def write_parse_log(path, mode, collection, description):
     with open(path, mode) as write_log_file:
-        write_log_file.write("\n" * 2 + "#" * 15 + "   TYPE OF LOG: " + type_of_log(description) + " LOG FROM: " + description +
+        write_log_file.write("\n" * 2 + "#" * 15 + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
                              "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n" * 3)
         write_log_file.writelines(collection)
 
