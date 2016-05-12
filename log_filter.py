@@ -25,22 +25,15 @@ except getopt.GetoptError:
 for opt, arg in opts:
     if opt in ('-p', '--path'):
         path_arg = arg
-    elif opt in ('-r', '--regexp'):
-        regexp_arg = arg
+    elif (opt in ('-r', '--regexp')):
+        if arg.lower() != 'all':
+            regexp_arg = arg.lower()
     elif opt in ('-e', '--extension'):
-        extension_arg = arg
+        extension_arg = arg.lower()
     else:
         sys.exit(2)
 
 parse_log_file_path = path_arg + os.sep + time.strftime("%d-%m-%y_%H-%M-%S") + '_parse_'
-
-
-# class InvalidPathException(Exception):
-#     def __init__(self, value):
-#         self.value = value
-#
-#     def __str__(self):
-#         return `self.value`
 
 
 def read_options_file(path, mode, collection):
@@ -55,7 +48,7 @@ def read_log(path, mode):
     with open(path, mode) as read_log_file:
         for line in read_log_file:
             count_lines += 1
-            if any(key in line.lower() for key in keywords) and not (any(ignore in line for ignore in ignore_words)):
+            if any(key in line.lower() for key in keywords) and not (any(ignore in line.lower() for ignore in ignore_words)):
                 log_collection.append("Line number: " + str(count_lines) + "   Message :   " + line)
     return log_collection
 
@@ -70,10 +63,10 @@ def write_parse_log(path, mode, collection, description):
 def type_of_log(filename):
     if isinstance(regexp_arg, tuple):
         for log_type in regexp_arg:
-            if re.search(log_type, filename):
+            if re.search(log_type, filename.lower()):
                 return log_type
     else:
-        if re.search(regexp_arg, filename):
+        if re.search(regexp_arg, filename.lower()):
             return regexp_arg
 
 
@@ -89,7 +82,6 @@ def find_file(path = '.', regexp = '.*', extension = 'txt'):
         else:
             return [path + os.sep + file for file in os.listdir(path) if re.search(".*(" + regexp + "){1}.*" + extension + "{1}", file)]
     else:
-        # raise InvalidPathException, "ERROR: Invalid path!"
         print "ERROR: Invalid path!"
         sys.exit(2)
 
