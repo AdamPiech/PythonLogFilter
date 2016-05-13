@@ -73,8 +73,8 @@ def read_log(path, mode):
 # This function is used to write a resulting collection (from read_log) with description about log file.
 def write_parse_log(path, mode, collection, description):
     with open(path, mode) as write_log_file:
-        write_log_file.write("\n" * 2 + "#" * 15 + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
-                             "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n" * 3)
+        write_log_file.write("\n" + "#" * 15 + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
+                             "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n")
         write_log_file.writelines(collection)
 
 
