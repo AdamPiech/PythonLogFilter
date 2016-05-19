@@ -89,6 +89,21 @@ def type_of_log(filename):
             return regexp_arg
 
 
+# This function return postfix from the name of file which is took from the file path
+def type_of_postfix(filename):
+    result = []
+    for part_of_filename in  os.path.basename(os.path.splitext(filename)[0]).split('_')[::-1]:
+        # TEMPORARY CODE TO DELETE AFTER DAREK's LOG NAMES CHANGE
+        if part_of_filename.__eq__("INCOMPLETE") or part_of_filename.__eq__("EMPTY"):
+            continue
+        # THIS CODE SHOULD REMAIN UNCHANGED
+        if part_of_filename.isdigit():
+            result.append(part_of_filename)
+            continue
+        result.append(part_of_filename)
+        return '_' + '_'.join(result[::-1])
+
+
 # This function is used to get all files from selected directory, which contains specified regexp and/or extension in
 # its name. It retuns a list of path to file.
 def find_file(path = '.', regexp = '.*', extension = 'txt'):
@@ -115,4 +130,4 @@ read_options_file(ignore_file, read_mode, ignore_words)
 # where the logs files were found.
 for file in find_file(path_arg, regexp_arg, extension_arg):
     log_file_lines = read_log(file, read_mode)
-    write_parse_log(parse_log_file_path + ("all" if isinstance(regexp_arg, tuple) else regexp_arg) + ".log", write_mode, log_file_lines, file)
+    write_parse_log(parse_log_file_path + ("all" if isinstance(regexp_arg, tuple) else regexp_arg) + type_of_postfix(file) + ".log", write_mode, log_file_lines, file)
