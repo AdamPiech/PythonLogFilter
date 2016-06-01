@@ -70,17 +70,20 @@ def read_log(path, mode):
                 log_collection.append("Line number: " + str(count_lines) + "   Message :   " + line)
     return log_collection
 
+
 #Function is similar to upper one, if OSE DUMP occurs it appends it to resulting log.
 def ose_dump_occur(path,mode):
     count_lines = 0
     log_lines = []
+    ose_keyword = "OSE DUMP"
+    ose_end_keyword = "END OF OSE DUMP"
     with open(path,mode) as read_log_file:
         parsing = False
         for line in read_log_file:
             count_lines += 1
-            if line.startswith("======================= OSE DUMP"):
+            if ose_keyword in line:
                 parsing = True
-            if line.startswith("======================= END OF OSE DUMP"):
+            if ose_end_keyword in line:
                 log_lines.append("Line number: " + str(count_lines) + "   Message :   " + 23*"=" + " END OF OSE DUMP " + 30*"="+"\n")
                 parsing = False
             if parsing:
