@@ -70,7 +70,7 @@ def read_log(path, mode):
                 log_collection.append("Line number: " + str(count_lines) + "   Message :   " + line)
     return log_collection
 
-
+#Function is similar to upper one, if OSE DUMP occurs it appends it to resulting log.
 def ose_dump_occur(path,mode):
     count_lines = 0
     log_lines = []
