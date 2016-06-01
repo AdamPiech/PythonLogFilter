@@ -6,10 +6,10 @@ import getopt
 
 settings_file = os.path.join('settings', 'extract')
 # path to extract patterns on Jenkins
-# settings_file = os.path.join(os.sep, 'proj', 'bscautodata', 'bts_ci', 'rbslog_parser', 'settings', 'extract')
+#settings_file = os.path.join(os.sep, 'proj', 'bscautodata', 'bts_ci', 'rbslog_parser', 'settings', 'extract')
 ignore_file = os.path.join('settings', 'ignore')
 # path to ignore patterns on Jenkins
-# ignore_file = os.path.join(os.sep, 'proj', 'bscautodata', 'bts_ci', 'rbslog_parser', 'settings', 'ignore')
+#ignore_file = os.path.join(os.sep, 'proj', 'bscautodata', 'bts_ci', 'rbslog_parser', 'settings', 'ignore')
 
 # collection of all extracted lines from log
 log_file_lines = []
@@ -19,6 +19,7 @@ keywords = set()
 ignore_words = set()
 write_mode = 'a'
 read_mode = 'r'
+
 
 # default parser settings when no parameters passed
 path_arg = '..'
@@ -70,12 +71,34 @@ def read_log(path, mode):
     return log_collection
 
 
+def ose_dump_occur(path,mode):
+    count_lines = 0
+    log_lines = []
+    with open(path,mode) as read_log_file:
+        parsing = False
+        for line in read_log_file:
+            count_lines += 1
+            if line.startswith("======================= OSE DUMP"):
+                parsing = True
+            if line.startswith("======================= END OF OSE DUMP"):
+                log_lines.append("Line number: " + str(count_lines) + "   Message :   " + 23*"=" + " END OF OSE DUMP " + 30*"="+"\n")
+                parsing = False
+            if parsing:
+                log_lines.append("Line number: " + str(count_lines) + "   Message :   " + line)
+    return log_lines
+
+
 # This function is used to write a resulting collection (from read_log) with description about log file.
 def write_parse_log(path, mode, collection, description):
     with open(path, mode) as write_log_file:
-        write_log_file.write("\n" + "#" * 15 + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
-                             "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n")
-        write_log_file.writelines(collection)
+        if not collection:
+            write_log_file.write("THERE IS NO OSE DUMP IN:" + "#" * 15 + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
+                                 "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n")
+            write_log_file.writelines(collection)
+        else:
+            write_log_file.write("\n" + "#" * 15 + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
+                                 "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n")
+            write_log_file.writelines(collection)
 
 
 # This function checks the type of log. It gets a filename of current log file and returns a type of log.
@@ -121,6 +144,7 @@ def find_file(path = '.', regexp = '.*', extension = 'txt'):
         print "ERROR: Invalid path!"
         sys.exit(2)
 
+
 # Read settings
 read_options_file(settings_file, read_mode, keywords)
 read_options_file(ignore_file, read_mode, ignore_words)
@@ -129,5 +153,10 @@ read_options_file(ignore_file, read_mode, ignore_words)
 # of pattern which was used to choose files to parse. The resulting log file is written in directory
 # where the logs files were found.
 for file in find_file(path_arg, regexp_arg, extension_arg):
+    log_lines = ose_dump_occur(file, read_mode)
+    write_parse_log(parse_log_file_path + ("all" if isinstance(regexp_arg, tuple) else regexp_arg) + type_of_postfix(file) + ".log", write_mode, log_lines, file)
+for file in find_file(path_arg, regexp_arg, extension_arg):
     log_file_lines = read_log(file, read_mode)
     write_parse_log(parse_log_file_path + ("all" if isinstance(regexp_arg, tuple) else regexp_arg) + type_of_postfix(file) + ".log", write_mode, log_file_lines, file)
+
+
