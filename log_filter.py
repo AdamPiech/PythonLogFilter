@@ -45,21 +45,23 @@ for opt, arg in opts:
     else:
         sys.exit(2)
 
+
 # path to parsed result
 parse_log_file_path = path_arg + os.sep + time.strftime("%d-%m-%y_%H-%M-%S") + '_parse_'
 
 
-# function used to read settings from keywords and ignore_words collections
+# Function used to read settings from keywords and ignore_words collections
 def read_options_file(path, mode, collection):
     with open(path, mode) as read_settings:
         for settings in read_settings:
             collection.add(settings.replace('\n', ''))
 
-
 # Function used to read specified logs. It walks line by line through log file, checks if line contains pattern from
 # keywords and then checks if there is pattern from ignored_words. In case it contains pattern from ignored_words,
 # the line is not appended to log_collection, otherwise it is appended to log_collection.
 # There is also a message about number of line, where the pattern was.
+
+
 def read_log(path, mode):
     count_lines = 0
     log_collection = []
@@ -93,10 +95,10 @@ def ose_dump_occur(path, mode):
 # This function is used to write a resulting collection (from read_log) with description about log file.
 def write_parse_log(path, mode, collection, description, title):
     with open(path, mode) as write_log_file:
-        ose_dump_info = "\nTHERE IS NO OSE DUMP" if not collection else ""
-        write_log_file.write(title + "\n" + "#" * 15  + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
-                                                     "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + ose_dump_info + "\n")
-        write_log_file.writelines(collection)
+        if collection:
+            write_log_file.write(title + "\n" + "#" * 15  + "   TYPE OF LOG: " + type_of_log(description) + "   LOG FROM: " + description +
+                                                     "   CURRENT SERVER TIME: " + time.strftime("%y/%m/%d %H:%M:%S") + "   " + "#" * 15 + "\n")
+            write_log_file.writelines(collection)
 
 
 # This function checks the type of log. It gets a filename of current log file and returns a type of log.
@@ -150,7 +152,6 @@ read_options_file(ignore_file, read_mode, ignore_words)
 # This loop is used to parse selected log files. Name of the resulting parsed file is created by a name
 # of pattern which was used to choose files to parse. The resulting log file is written in directory
 # where the logs files were found.
-
 
 
 for file in find_file(path_arg, regexp_arg, extension_arg):
